@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
+import SoundPlayer from '../utils/audioHelper';
 
+const soundPlayer = new SoundPlayer();
 import {
   StyleSheet,
   Image,
@@ -25,6 +27,26 @@ const LoginScreen = ({ navigation }) => {
       useNativeDriver: true,
     }).start();
   }, [fadeTitle]);
+
+  useEffect(() => {
+    const loadAndPlaySound = async () => {
+      try {
+        await soundPlayer.loadSound(require('../sounds/song.mp3'));
+        await soundPlayer.setVolumeAsync(0.5);
+        await soundPlayer.playSound();
+        console.log('entre');
+      } catch (error) {
+        console.error('Error loading or playing sound:', error);
+      }
+    }
+
+    loadAndPlaySound();
+    
+    return () => {
+      console.log('hh');
+      soundPlayer.unloadSound(); // Limpiar el sonido cuando el componente se desmonta
+    };
+  }, []);
 
   const [fadeAnim] = useState(new Animated.Value(0));
   const [floatAnim] = useState(new Animated.Value(0));
@@ -59,6 +81,7 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = () => {
     navigation.navigate("Memory");
+    soundPlayer.unloadSound();
   };
 
   return (
